@@ -1,0 +1,178 @@
+﻿@model Taxtation.ViewModel.TXTPurchaseDetailView
+
+@{
+    ViewData["Title"] = "Purchase";
+    var index = 5;
+    if (Model.detail.detail != null) { index = Model.detail.detail.Count; }
+}
+
+<h2>Purchase</h2>
+<form asp-action="Purchase" method="post">
+    <div class="row">
+        <div class="col-md-4">
+            Purchase Order:
+            <input type="text" asp-for="master.PurPoref" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            Transaction Date:
+            <input type="date" asp-for="master.PurDate" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            Term:
+            <select asp-for="master.PurType" class="form-control">
+                <option value="CREDIT">CREDIT</option>
+                <option value="CASH">CASH</option>
+                <option value="BANK">BANK</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Cash/Bank:
+            <select asp-for="master.BnkId" class="form-control">
+                <option>Select</option>
+                @foreach (var j in Model.lstBank)
+                {
+                    <option value=@j.BnkId>@j.BnkName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            Cheque/Ref No:
+            <input type="text" asp-for="master.PurChqNo" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            Cheque Date:
+            <input type="date" asp-for="master.PurChqDate" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Purchase Type:
+            <select asp-for="master.PurType" class="form-control">
+                <option value="LOCAL">LOCAL</option>
+                <option value="IMPORT">IMPORT</option>
+                <option value="EXEMPT">EXEMPT</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            Item Type:
+            <select asp-for="master.PurItmType" class="form-control">
+                <option value="LOCAL">LOCAL</option>
+                <option value="IMPORT">IMPORTED</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            Exchange Rate:
+            <input type="number" asp-for="master.PurExRate" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Site:
+            <select asp-for="master.SitId" class="form-control" required="required">
+                <option>Select</option>
+                @foreach (var j in Model.lstSite)
+                {
+                    <option value=@j.SitId>@j.SitName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            Remarks:
+            <input type="text" asp-for="master.PurRemarks" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12" style="overflow-x:scroll;">
+            <table id="myTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width:230px;">Item</th>
+                        <th style="width:120px;">UOM</th>
+                        <th style="width:120px;">Last Price</th>
+                        <th style="width:120px;">Quantity</th>
+                        <th style="width:120px;">Price</th>
+                        <th style="width:120px;">Sub. Amount</th>
+                        <th style="width:230px;">Excise Slab</th>
+                        <th style="width:120px;">Excise Percent</th>
+                        <th style="width:120px;">Excise Amount</th>
+                        <th style="width:120px;">Amt. After Excise</th>
+                        <th style="width:120px;">Disc. Type</th>
+                        <th style="width:120px;">Disc.</th>
+                        <th style="width:120px;">Disc. Amount</th>
+                        <th style="width:120px;">Amt. After Disc.</th>
+                        <th style="width:230px;">VAT Slab</th>
+                        <th style="width:120px;">VAT Percent</th>
+                        <th style="width:120px;">VAT Amount</th>
+                        <th style="width:120px;">Net Amount</th>
+                        <th style="width:120px;">Exc. Amount</th>
+                        <th style="width:230px;">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < index; i++)
+                    {
+                        <tr>
+                            <td>
+                                <select asp-for="detail.detail[i].ItmId" onchange="changeItem(this)" class="form-control" style="width:230px;">
+                                    <option value="-1">Select</option>@foreach (var j in Model.lstItem)
+                                    {
+                                        <option value=@j.ItmId>@j.ItmName</option>}
+                                </select>
+                            </td>
+                            <td>UOM</td>
+                            <td><input type="number" asp-for="detail.detail[i].PurAmount" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurQty" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurRate" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.pdef[i].subAmount" class="form-control" style="width:120px;" /></td>
+                            <td>
+                                <select asp-for="detail.detail[i].ExciseId" class="form-control" style="width:230px;">
+                                    <option>Select</option>@foreach (var j in Model.lstExcise)
+                                    {
+                                        <option value=@j.TaxId>@j.TaxName</option>}
+                                </select>
+                            </td>
+                            <td><input type="number" asp-for="detail.detail[i].PurExPer" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurExAmt" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.pdef[i].AmtAfterExcise" class="form-control" style="width:120px;" /></td>
+                            <td><select asp-for="detail.pdef[i].DiscountType" class="form-control" style="width:120px;"><option value="PERCENT">PERCENT</option><option value="AMOUNT">AMOUNT</option></select></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurDiscountPer" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurDiscountAmt" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.pdef[i].AmtAfterDiscount" class="form-control" style="width:120px;" /></td>
+                            <td>
+                                <select asp-for="detail.detail[i].TaxId" class="form-control" style="width:230px;">
+                                    <option value="-1">Select</option> @foreach (var j in Model.lstTax)
+                                    {
+                                        <option value=@j.TaxId>@j.TaxName</option>}
+                                </select>
+                            </td>
+                            <td><input type="number" asp-for="detail.detail[i].PurTaxPer" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurTaxAmt" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurNetAmt" class="form-control" style="width:120px;" /></td>
+                            <td><input type="number" asp-for="detail.detail[i].PurGrossAmt" class="form-control" style="width:120px;" /></td>
+                            <td><input type="text" asp-for="detail.detail[i].PurRemarks" class="form-control" style="width:230px;" /></td>
+                            <td><input type="text" asp-for="detail.detail[i].PurRemarks" class="form-control" style="width:230px;" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        function changeItem(item) {
+            debugger;
+            var j = item;
+        }
+    </script>
+
+}
